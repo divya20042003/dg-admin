@@ -10,15 +10,17 @@ export const adminLogin = createAsyncThunk(
     try {
       const response = await loginApi(credentials);
 
+      // Check for business-level status (even if HTTP is 200)
       if (response.status === "SUCCESS") {
         localStorage.setItem("adminToken", response.data.token);
         localStorage.setItem("adminData", JSON.stringify(response.data));
         return response.data;
       }
 
+      // Handle FAILED status - return the error message from API
       return rejectWithValue(response.message || "Login failed");
     } catch (error) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.message || "Network error");
     }
   }
 );
@@ -36,9 +38,13 @@ const authSlice = createSlice({
     logout: (state) => {
       state.admin = null;
       state.isAuthenticated = false;
+      state.error = null;
 
       localStorage.removeItem("adminToken");
       localStorage.removeItem("adminData");
+    },
+    clearError: (state) => {
+      state.error = null;
     },
   },
 
@@ -60,5 +66,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout } = authSlice.actions;
+export const { logout, clearError } = authSlice.actions;
 export default authSlice.reducer;

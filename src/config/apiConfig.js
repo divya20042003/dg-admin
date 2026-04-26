@@ -7,6 +7,14 @@ const API = {
     LOGIN: "/admin/login",
     LOGOUT: "/admin/logout",
   },
+
+  PRODUCTS: {
+    LIST: "/products",
+    ADD: "/products",
+    GET: (id) => `/products/${id}`,
+    UPDATE: (id) => `/products/${id}`,
+    DELETE: (id) => `/products/${id}`,
+  },
 };
 
 export default API;
