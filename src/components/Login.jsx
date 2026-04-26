@@ -1,18 +1,31 @@
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import { adminLogin } from "../redux/authSlice";
+import { adminLogin, clearError } from "../redux/authSlice";
 
 function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { isLoading, isError, errorMessage, isAuthenticated } = useSelector(
+  const { isLoading, error, isAuthenticated } = useSelector(
     (state) => state.auth
   );
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [localError, setLocalError] = useState("");
+
+  // Clear error when user starts typing
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
+    setLocalError("");
+    dispatch(clearError());
+  };
+
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+    setLocalError("");
+    dispatch(clearError());
+  };
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -47,10 +60,10 @@ function Login() {
   };
 
   useEffect(() => {
-    if (isError && errorMessage) {
-      setLocalError(errorMessage);
+    if (error) {
+      setLocalError(error);
     }
-  }, [isError, errorMessage]);
+  }, [error]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -64,7 +77,7 @@ function Login() {
             type="email"
             placeholder="Email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={handleEmailChange}
             className="w-full border p-3 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-purple-500"
             disabled={isLoading}
           />
@@ -73,14 +86,14 @@ function Login() {
             type="password"
             placeholder="Password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={handlePasswordChange}
             className="w-full border p-3 rounded-lg mb-5 focus:outline-none focus:ring-2 focus:ring-purple-500"
             disabled={isLoading}
           />
 
-          {(localError || isError) && (
+          {localError && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-              {localError || errorMessage}
+              {localError}
             </div>
           )}
 
@@ -92,10 +105,6 @@ function Login() {
             {isLoading ? "Logging in..." : "Login"}
           </button>
         </form>
-
-        <p className="text-center text-gray-500 text-sm mt-4">
-          Demo: admin@gmail.com / admin@123
-        </p>
       </div>
     </div>
   );
